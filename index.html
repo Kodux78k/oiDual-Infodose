@@ -2,39 +2,27 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <title>DUAL // FUSION OS — Morph & Stagger (small-preview clickable)</title>
+  <title>DUAL // FUSION OS — Morph & Stagger (small-preview clickable + ASCII)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070a">
 
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#2563eb">
-  <link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#2563eb">
+<link rel="apple-touch-icon" href="./icon-192.png">
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('Service Worker Registered'));
-    }
-  </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('Service Worker Registered'));
+  }
+</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- DOMPurify (CDNJS) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.7/purify.min.js" integrity="" crossorigin="anonymous"></script>
-
-  <!-- postcss-selector-parser (robusto para manipular SELECTORS) -->
-  <script src="https://cdn.jsdelivr.net/npm/postcss-selector-parser@7.1.1/dist/index.umd.js"></script>
-
-  <!-- CodeMirror 5 (CDNJS) - core + CSS mode + theme -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
-
-  <!-- html2canvas para export PNG -->
+  <!-- html2canvas para export PNG da ativação -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -199,24 +187,16 @@
       100%{ box-shadow: 0 0 0 0 rgba(255,210,80,0.0); transform: translateY(0); }
     }
 
-    /* ASCII activation card */
-    .activation-wrap{display:flex;flex-direction:column;gap:8px}
-    .activation-toggle{display:flex;gap:8px;align-items:center;cursor:pointer}
-    .activation-card{
-      background:rgba(0,0,0,0.25);
-      border:1px solid rgba(255,255,255,0.04);
-      padding:12px;border-radius:10px;overflow:hidden;transition:all 320ms var(--ease-smooth);
-    }
+    /* --- ATIVAÇÃO ASCII --- */
+    .activation-wrap{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+    .activation-toggle{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);cursor:pointer;background:rgba(255,255,255,0.02)}
+    .activation-card{background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.03);padding:12px;border-radius:12px;overflow:hidden;transition:all 280ms var(--ease-smooth)}
     .activation-pre{font-family:var(--font-code);white-space:pre-wrap;margin:0;padding:8px;background:rgba(0,0,0,0.12);border-radius:8px;border:1px dashed rgba(255,255,255,0.03);color:#fff}
-    .activation-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    .activation-mini{display:flex;align-items:center;gap:8px}
-    .activation-mini .mini-avatar{width:36px;height:36px;border-radius:8px;overflow:hidden;background:#071018;display:inline-flex;align-items:center;justify-content:center}
-    .activation-badge{font-family:var(--font-code);background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.02)}
     .activation-hidden{max-height:0;opacity:0;padding:0 12px;pointer-events:none}
     .activation-open{max-height:400px;opacity:1;padding:12px}
-    /* CodeMirror tweak: allow vertical resize */
-    .CodeMirror { border-radius:8px; background: #071018; }
-    .CodeMirror-scroll { max-height: 320px; }
+    .activation-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .activation-mini{display:flex;align-items:center;gap:8px}
+    /* fim ativação */
 
     @media (max-width:420px){ .fusion-card.closed{width:220px} .brand-dual{font-size:1rem} }
   </style>
@@ -265,9 +245,9 @@
           <i data-lucide="chevron-down" id="triggerIcon"></i>
         </div>
 
-        <!-- ----- ACTIVATION ASCII (BASE) ----- -->
+        <!-- ATIVAÇÃO ASCII (adicionada) -->
         <div class="activation-wrap stagger-item">
-          <div class="activation-toggle" id="activationToggle" onclick="toggleActivation()">
+          <div class="activation-toggle" id="activationToggle" role="button" tabindex="0" aria-expanded="false">
             <div style="display:flex;align-items:center;gap:8px">
               <div style="width:10px;height:10px;border-radius:99px;background:var(--neon-cyan)"></div>
               <strong style="letter-spacing:1px">Ativação ASCII</strong>
@@ -275,10 +255,10 @@
             <div style="margin-left:auto;font-size:0.82rem;color:rgba(255,255,255,0.6)">BASE v1</div>
           </div>
 
-          <div id="activationCard" class="activation-card activation-hidden">
+          <div id="activationCard" class="activation-card activation-hidden" aria-live="polite">
             <div style="display:flex;align-items:flex-start;gap:10px">
-              <div class="activation-mini">
-                <div class="mini-avatar" id="actMiniAvatar"></div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="mini-avatar" id="actMiniAvatar" aria-hidden="true"></div>
                 <div style="display:flex;flex-direction:column;">
                   <div id="actTitle" style="font-weight:700">CÉREBRO-ORÁCULO — BASE v1</div>
                   <div style="font-size:0.78rem;color:rgba(255,255,255,0.55)">Ativar: <span id="actName">(Convidado).Dual Infodose</span></div>
@@ -290,7 +270,7 @@
               </div>
             </div>
 
-            <pre id="actPre" class="activation-pre" aria-live="polite">
+            <pre id="actPre" class="activation-pre" aria-hidden="false">
 +------------------------------+
 | CÉREBRO-ORÁCULO — BASE v1    |
 +------------------------------+
@@ -299,14 +279,11 @@ Ativar: (Convidado).Dual Infodose
 
             <div class="activation-controls">
               <button class="trigger-btn" id="copyActBtn" type="button">COPIAR</button>
-              <button class="trigger-btn" id="waActBtn" type="button">WHATSAPP</button>
-              <button class="trigger-btn" id="gemActBtn" type="button">GEMINI</button>
-              <button class="trigger-btn" id="chatActBtn" type="button">ChatGPT</button>
               <button class="trigger-btn" id="downloadActBtn" type="button">EXPORT PNG</button>
             </div>
           </div>
         </div>
-        <!-- ----- fim ACTIVATION ASCII ----- -->
+        <!-- fim ativação -->
 
         <div class="hidden-modules stagger-item" id="modulesArea">
           <div class="modules-inner">
@@ -333,62 +310,7 @@ Ativar: (Convidado).Dual Infodose
               <div class="bar-track"><div class="bar-fill" id="cycleFill"></div></div>
             </div>
 
-            <!-- ======= MODULE HOST com DOMPurify + CSS Editor (SUBSTITUIR A SUA html-module-slot) ======= -->
-            <div class="html-module-slot" id="moduleHost">
-              <div id="moduleControls" style="display:flex;flex-direction:column;gap:10px;width:100%">
-
-                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                  <label style="flex:1">
-                    <input id="fileInput" type="file" accept=".html,.htm,.md,.markdown,.css,.txt" style="display:none" />
-                    <button class="trigger-btn" id="chooseBtn" type="button">Carregar módulo (HTML / MD / CSS)</button>
-                  </label>
-
-                  <button class="trigger-btn" id="crystallizeBtn" type="button" title="Salvar módulo no dispositivo">CRISTALIZAR</button>
-                  <button class="trigger-btn" id="clearModulesBtn" type="button" title="Remover módulos salvos">LIMPAR</button>
-
-                  <label style="font-size:0.78rem;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px;">
-                    <input type="checkbox" id="allowUnsafe" /> Injecção *unsafe* (scripts)
-                  </label>
-                </div>
-
-                <div id="dropZone" style="border-radius:10px;padding:10px;border:1px dashed rgba(255,255,255,0.06);font-size:0.78rem;">
-                  Arraste arquivos aqui ou clique em "Carregar módulo".
-                </div>
-
-                <div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;">
-                  <button class="trigger-btn" id="injectBtn" type="button">INJETAR NO CARD</button>
-                  <button class="trigger-btn" id="speakBtn" type="button">LER (TTS)</button>
-                  <button class="trigger-btn" id="removePreviewBtn" type="button">REMOVER PREVIEW</button>
-                </div>
-
-                <!-- PREVIEW -->
-                <div id="previewArea" style="margin-top:10px;border-radius:12px;background:rgba(0,0,0,0.18);padding:10px;min-height:84px;">
-                  <div id="previewMeta" style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-bottom:6px;">Preview vazio</div>
-                  <div id="previewInner" style="border-radius:8px;overflow:hidden;"></div>
-                </div>
-
-                <!-- CSS Editor -->
-                <details style="margin-top:10px;color:rgba(255,255,255,0.9)">
-                  <summary style="cursor:pointer;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">Editor de CSS (live)</summary>
-                  <div style="display:flex;gap:8px;flex-direction:column;padding:8px;">
-                    <textarea id="cssEditor" placeholder="Escreva CSS aqui..." style="width:100%;height:120px;background:rgba(0,0,0,0.25);color:#fff;padding:10px;border-radius:8px;font-family:var(--font-code);"></textarea>
-                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                      <button class="trigger-btn" id="applyCssBtn">APLICAR CSS</button>
-                      <button class="trigger-btn" id="saveCssBtn">SALVAR CSS</button>
-                      <button class="trigger-btn" id="resetCssBtn">RESET</button>
-                      <label style="font-size:0.78rem;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:8px;">
-                        <input type="checkbox" id="scopeCss" checked /> Prefixar com <code>.fusion-card</code>
-                      </label>
-                      <span style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Live update com debounce</span>
-                    </div>
-                  </div>
-                </details>
-
-                <div id="savedModulesList" style="margin-top:8px;font-size:0.82rem;color:rgba(255,255,255,0.8);"></div>
-              </div>
-            </div>
-            <!-- ======= fim MODULE HOST ======= -->
-
+            <div class="html-module-slot">// MÓDULO EXTERNO — PRONTO PARA INJEÇÃO HTML</div>
           </div>
         </div>
       </div>
@@ -414,6 +336,8 @@ Ativar: (Convidado).Dual Infodose
       smallMiniAvatar: document.getElementById('smallMiniAvatar'),
       smallText: document.getElementById('smallText'),
       smallIdent: document.getElementById('smallIdent'),
+
+      // ativação
       activationToggle: document.getElementById('activationToggle'),
       activationCard: document.getElementById('activationCard'),
       actPre: document.getElementById('actPre'),
@@ -421,9 +345,6 @@ Ativar: (Convidado).Dual Infodose
       actMiniAvatar: document.getElementById('actMiniAvatar'),
       actBadge: document.getElementById('actBadge'),
       copyActBtn: document.getElementById('copyActBtn'),
-      waActBtn: document.getElementById('waActBtn'),
-      gemActBtn: document.getElementById('gemActBtn'),
-      chatActBtn: document.getElementById('chatActBtn'),
       downloadActBtn: document.getElementById('downloadActBtn')
     };
 
@@ -504,35 +425,33 @@ Ativar: (Convidado).Dual Infodose
       }
       els.smallMiniAvatar.innerHTML = makeMiniAvatarHTML(name || 'DUAL', 30);
 
-      // também atualiza a ativação
+      // update activation panel too
       updateActivationBlock(name || 'Convidado');
     }
 
-    // ASCII Activation generator
+    // --- ASCII Activation generator ---
     function createAsciiActivation(name){
       const displayName = name && name.trim() ? `${name.trim()}.Dual Infodose` : '(Convidado).Dual Infodose';
       const root = reduce369Short(name);
-      // lines (adjust width dynamically)
       const title = 'CÉREBRO-ORÁCULO — BASE v1';
       const content = `Ativar: ${displayName}`;
       const width = Math.max(title.length, content.length) + 4;
       const top = '+' + '-'.repeat(width) + '+';
       const midTitle = `| ${title.padEnd(width - 1)}|`;
       const top2 = '+' + '-'.repeat(width) + '+';
-      const body = `${content}`;
-      const ascii = `${top}\n${midTitle}\n${top2}\n${body}\n`;
+      const ascii = `${top}\n${midTitle}\n${top2}\n${content}\n`;
       return { ascii, displayName, root, title, content };
     }
-
     function updateActivationBlock(name){
       const r = createAsciiActivation(name);
-      els.actPre.innerText = r.ascii;
-      els.actName.innerText = r.displayName;
-      els.actMiniAvatar.innerHTML = makeMiniAvatarHTML(name || 'DUAL', 36);
-      els.actBadge.innerText = `v:${r.root}`;
-      // vibe gold on 3/6/9
-      els.actBadge.classList.remove('vibe-gold');
-      if(r.root === 3 || r.root === 6 || r.root === 9) { els.actBadge.classList.add('vibe-gold'); }
+      if(els.actPre) els.actPre.innerText = r.ascii;
+      if(els.actName) els.actName.innerText = r.displayName;
+      if(els.actMiniAvatar) els.actMiniAvatar.innerHTML = makeMiniAvatarHTML(name || 'DUAL', 36);
+      if(els.actBadge){
+        els.actBadge.innerText = `v:${r.root}`;
+        els.actBadge.classList.remove('vibe-gold');
+        if(r.root === 3 || r.root === 6 || r.root === 9) els.actBadge.classList.add('vibe-gold');
+      }
     }
 
     // Inicialização
@@ -540,7 +459,6 @@ Ativar: (Convidado).Dual Infodose
       setTimeout(()=> {
         els.card.classList.add('active');
         els.avatarTgt.classList.add('shown');
-        speak('');
         const saved = localStorage.getItem('fusion_user');
         if(saved){ setUserName(saved); speak(`Bem-vindo de volta, ${saved}.`); updateSmallPreviewFromName(saved); }
         else { speak('Sistema Dual pronto.'); updateSmallPreviewFromName(''); }
@@ -619,8 +537,10 @@ Ativar: (Convidado).Dual Infodose
 
     // small-preview click -> abre card + foca input
     els.smallPreview.addEventListener('click', (e) => {
+      // se fechado, abre; se aberto, foca input
       if(els.card.classList.contains('closed')) {
         toggleCard();
+        // foco já será dado após animation, mas garantir um foco também
         setTimeout(()=> els.input.focus(), 500);
       } else {
         els.input.focus();
@@ -655,19 +575,15 @@ Ativar: (Convidado).Dual Infodose
       lucide.createIcons();
     }
 
-    // Activation toggle (sanfonado)
-    function toggleActivation(){
-      els.activationCard.classList.toggle('activation-hidden');
-      els.activationCard.classList.toggle('activation-open');
-    }
-
     // Clock
     function updateMetrics(){
       const now = new Date();
       els.clock.innerText = now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
       const pct = Math.min(100, Math.max(0, ((now.getHours() + now.getMinutes()/60) / 24) * 100));
-      document.getElementById('cycleFill').style.width = `${pct}%`;
-      document.getElementById('cyclePercent').innerText = `${Math.floor(pct)}%`;
+      const fill = document.getElementById('cycleFill');
+      if(fill) fill.style.width = `${pct}%`;
+      const cyclePercent = document.getElementById('cyclePercent');
+      if(cyclePercent) cyclePercent.innerText = `${Math.floor(pct)}%`;
     }
 
     // TTS
@@ -682,387 +598,82 @@ Ativar: (Convidado).Dual Infodose
 
     setInterval(updateMetrics,1000); updateMetrics();
 
-    /* ================= Module system (com DOMPurify + CSS editor com parser robusto) ================= */
-    (function(){
-      // elementos
-      const fileInput = document.getElementById('fileInput');
-      const chooseBtn  = document.getElementById('chooseBtn');
-      const dropZone   = document.getElementById('dropZone');
-      const previewMeta = document.getElementById('previewMeta');
-      const previewInner = document.getElementById('previewInner');
-      const injectBtn  = document.getElementById('injectBtn');
-      const speakBtn   = document.getElementById('speakBtn');
-      const removePreviewBtn = document.getElementById('removePreviewBtn');
-      const allowUnsafeCheckbox = document.getElementById('allowUnsafe');
-      const crystallizeBtn = document.getElementById('crystallizeBtn');
-      const clearModulesBtn = document.getElementById('clearModulesBtn');
-      const savedModulesList = document.getElementById('savedModulesList');
+    // --- Ativação: toggle, copy, export ---
+    if(els.activationToggle){
+      els.activationToggle.addEventListener('click', toggleActivation);
+      els.activationToggle.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleActivation(); } });
+    }
 
-      // editor buttons
-      const applyCssBtn = document.getElementById('applyCssBtn');
-      const saveCssBtn = document.getElementById('saveCssBtn');
-      const resetCssBtn = document.getElementById('resetCssBtn');
-      const scopeCss = document.getElementById('scopeCss');
-
-      const MODULE_KEY = 'dual_fusion_modules_v1';
-      const CSS_KEY = 'dual_fusion_css_v1';
-      const STYLE_ID = 'injected-style-dual';
-
-      function readFileAsText(file){ return new Promise((res,rej)=>{
-        const r = new FileReader();
-        r.onload = ()=> res(String(r.result));
-        r.onerror = ()=> rej(r.error);
-        r.readAsText(file);
-      });}
-
-      // markdown renderer
-      function renderMarkdown(md){
-        md = String(md || '');
-        md = md.replace(/```([a-zA-Z0-9]*)\n([\s\S]*?)```/g, (m, lang, code)=> {
-          return `<pre data-md-code${lang?` data-lang="${lang}"`:''}><code>${escapeHtml(code)}</code></pre>`;
-        });
-        md = md.replace(/`([^`\n]+)`/g, (m, c)=> `<code>${escapeHtml(c)}</code>`);
-        for(let i=6;i>=1;i--){
-          const re = new RegExp('^'+ '#'.repeat(i) + '\\s*(.+)$','gm');
-          md = md.replace(re, `<h${i}>$1</h${i}>`);
-        }
-        md = md.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-        md = md.replace(/\*(.+?)\*/g,'<em>$1</em>');
-        md = md.replace(/^\s*[-\*]\s+(.+)$/gm, '<li>$1</li>');
-        md = md.replace(/(<li>[\s\S]*?<\/li>)/g, (m)=> `<ul>${m}</ul>`);
-        md = md.replace(/^\s*([^<\n].+)\s*$/gm, '<p>$1</p>');
-        return md;
+    function toggleActivation(){
+      if(!els.activationCard) return;
+      const wasHidden = els.activationCard.classList.contains('activation-hidden');
+      els.activationCard.classList.toggle('activation-hidden');
+      els.activationCard.classList.toggle('activation-open');
+      els.activationToggle.setAttribute('aria-expanded', String(wasHidden));
+      if(wasHidden){
+        // fala a ativação curta
+        const text = els.actPre ? els.actPre.innerText.replace(/\n/g,' ') : 'Ativação aberta';
+        speak(text);
       }
-      function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (c)=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]) );}
-      function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
+    }
 
-      // DOMPurify wrapper
-      function sanitizeHtml(html){
-        if(window.DOMPurify && typeof DOMPurify.sanitize === 'function'){
-          try { return DOMPurify.sanitize(html, {ADD_ATTR: ['target','rel']}); }
-          catch(e){ console.warn('DOMPurify falhou:', e); }
-        }
-        return html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi,'').replace(/ on\w+=(?:"[^"]*"|'[^']*'|[^\s>]+)/gi,'');
-      }
+    // copy to clipboard helper
+    function copyToClipboard(text){
+      if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return Promise.resolve();
+    }
 
-      // preview state
-      let currentModule = { type:null, name:null, content:null };
-
-      async function handleFile(file){
-        const name = file.name || 'uploaded';
-        const ext = (name.split('.').pop() || '').toLowerCase();
-        const txt = await readFileAsText(file);
-        currentModule = { type: ext, name, content: txt };
-        previewMeta.innerText = `${name} [${ext}] — ${Math.round(file.size/1024)}KB`;
-        renderPreview();
-      }
-
-      function renderPreview(){
-        previewInner.innerHTML = '';
-        if(!currentModule.type) { previewMeta.innerText = 'Preview vazio'; return;}
-        if(['md','markdown'].includes(currentModule.type) || currentModule.name.endsWith('.md')){
-          const html = renderMarkdown(currentModule.content);
-          const safeHtml = sanitizeHtml(html);
-          previewInner.innerHTML = safeHtml;
-        } else if(currentModule.type === 'css'){
-          previewInner.innerHTML = `<pre style="white-space:pre-wrap;font-family:var(--font-code);font-size:0.8rem">${escapeHtml(currentModule.content)}</pre>`;
-        } else {
-          const sanitized = sanitizeHtml(currentModule.content);
-          const iframe = document.createElement('iframe');
-          iframe.style.width='100%'; iframe.style.height='180px'; iframe.style.border='none'; iframe.style.borderRadius='8px';
-          iframe.setAttribute('sandbox','allow-forms allow-same-origin allow-popups');
-          iframe.srcdoc = sanitized;
-          previewInner.appendChild(iframe);
-        }
-      }
-
-      // ---------- Robust CSS scoping using postcss-selector-parser if available ----------
-      function prefixSelectorsString(selectorList, prefix) {
-        try {
-          const parser = (typeof postcssSelectorParser !== 'undefined') ? postcssSelectorParser : (window.postcssSelectorParser && window.postcssSelectorParser.default) ? window.postcssSelectorParser.default : null;
-          if(!parser) {
-            return selectorList.split(',').map(s => `${prefix} ${s.trim()}`).join(', ');
-          }
-          const transform = parser(selectors => {
-            selectors.each(sel => {
-              const classNode = parser.className({ value: prefix.replace(/^\./,'') });
-              const comb = parser.combinator({ value: ' ' });
-              sel.nodes.unshift(classNode);
-              sel.nodes.splice(1, 0, comb);
-            });
-          });
-          return transform.processSync(selectorList);
-        } catch (e) {
-          console.warn('prefixSelectorsString fallback:', e);
-          return selectorList.split(',').map(s => `${prefix} ${s.trim()}`).join(', ');
-        }
-      }
-
-      function processCssAndPrefix(cssText, prefix) {
-        let i = 0;
-        const len = cssText.length;
-        let out = '';
-        while(i < len) {
-          const nextOpen = cssText.indexOf('{', i);
-          if(nextOpen === -1) {
-            out += cssText.slice(i);
-            break;
-          }
-          const prelude = cssText.slice(i, nextOpen).trim();
-          let j = nextOpen + 1;
-          let depth = 1;
-          while(j < len && depth > 0) {
-            if(cssText[j] === '{') depth++;
-            else if(cssText[j] === '}') depth--;
-            j++;
-          }
-          const inner = cssText.slice(nextOpen + 1, j - 1);
-          if(prelude.startsWith('@')) {
-            out += prelude + '{' + processCssAndPrefix(inner, prefix) + '}';
-          } else {
-            const safePrelude = prelude;
-            const prefixed = prefixSelectorsString(safePrelude, prefix);
-            out += prefixed + '{' + inner + '}';
-          }
-          i = j;
-        }
-        return out;
-      }
-
-      function applyCss(cssText, scoped=true){
-        let css = String(cssText || '');
-        if(scoped){
-          try {
-            css = processCssAndPrefix(css, '.fusion-card');
-          } catch(e){
-            console.warn('applyCss: parsing failed, using simple prefix fallback', e);
-            css = css.split('}').map(block=>{
-              if(!block.trim()) return '';
-              const parts = block.split('{');
-              if(parts.length<2) return block+'}';
-              let selectors = parts[0].trim();
-              const body = parts.slice(1).join('{');
-              if(selectors.startsWith('@')) return selectors + '{' + body + '}';
-              selectors = selectors.split(',').map(s=>`.fusion-card ${s.trim()}`).join(', ');
-              return selectors + '{' + body + '}';
-            }).join(' ');
-          }
-        }
-        let style = document.getElementById(STYLE_ID);
-        if(!style){ style = document.createElement('style'); style.id = STYLE_ID; style.setAttribute('data-dual','true'); document.querySelector('.fusion-card').appendChild(style); }
-        style.textContent = css;
-      }
-
-      // TTS wrapper
-      function speakText(customText){
-        if(!window.speechSynthesis) return alert('TTS não suportado.');
-        window.speechSynthesis.cancel();
-        const text = customText || previewInner.innerText || previewInner.textContent || '';
-        if(!text.trim()) return;
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'pt-BR'; u.rate = 1.05;
-        window.speechSynthesis.speak(u);
-      }
-
-      // persistence
-      function loadSavedModules(){ try { const raw = localStorage.getItem(MODULE_KEY); return raw?JSON.parse(raw):[]; } catch(e){ return []; } }
-      function saveModules(list){ localStorage.setItem(MODULE_KEY, JSON.stringify(list)); renderSavedList(); }
-      function renderSavedList(){
-        const list = loadSavedModules();
-        if(!list.length){ savedModulesList.innerHTML = '<em style="color:rgba(255,255,255,0.45)">Nenhum módulo cristalizado</em>'; return; }
-        savedModulesList.innerHTML = '';
-        list.forEach((m,i)=>{
-          const btn = document.createElement('div'); btn.style.display='flex'; btn.style.gap='8px'; btn.style.alignItems='center'; btn.style.marginBottom='6px';
-          btn.innerHTML = `<div style="flex:1">${escapeHtml(m.name)} <small style="color:rgba(255,255,255,0.45);font-size:0.72rem">[${m.type}]</small></div>`;
-          const inject = document.createElement('button'); inject.className='trigger-btn'; inject.textContent='INJETAR';
-          const remove = document.createElement('button'); remove.className='trigger-btn'; remove.textContent='REMOVER';
-          inject.onclick = ()=> { currentModule = m; renderPreview(); injectModule(); };
-          remove.onclick = ()=> { if(!confirm('Remover módulo salvo?')) return; const arr = loadSavedModules(); arr.splice(i,1); saveModules(arr); };
-          btn.appendChild(inject); btn.appendChild(remove);
-          savedModulesList.appendChild(btn);
-        });
-      }
-
-      function crystallizeCurrent(){
-        if(!currentModule.type) return alert('Nenhum módulo carregado.');
-        const arr = loadSavedModules();
-        arr.push({type: currentModule.type, name: currentModule.name, content: currentModule.content});
-        saveModules(arr);
-        speakText('Módulo cristalizado.');
-      }
-      function clearSaved(){ if(!confirm('Remover todos módulos cristalizados?')) return; localStorage.removeItem(MODULE_KEY); renderSavedList(); speakText('Módulos removidos.'); }
-
-      function removePreview(){ currentModule = {type:null,name:null,content:null}; previewInner.innerHTML=''; previewMeta.innerText='Preview vazio'; }
-
-      // injecao ao card
-      function injectModule(){
-        if(!currentModule.type) return alert('Nenhum módulo carregado.');
-        const isUnsafe = allowUnsafeCheckbox.checked;
-        if(currentModule.type === 'css'){
-          applyCss(currentModule.content, scopeCss.checked);
-          speakText('CSS aplicado ao card.');
-          return;
-        }
-        if(['md','markdown'].includes(currentModule.type)){
-          const html = renderMarkdown(currentModule.content);
-          const safeHtml = sanitizeHtml(html);
-          const slot = document.querySelector('.modules-inner');
-          const wrapper = document.createElement('div'); wrapper.className='module-crystallized';
-          wrapper.innerHTML = safeHtml;
-          slot.appendChild(wrapper);
-          speakText('Markdown renderizado e injetado.');
-          return;
-        }
-
-        const sanitized = sanitizeHtml(currentModule.content);
-        if(isUnsafe){
-          if(!confirm('Aviso: Injecção unsafe permite execução de scripts. Confirmar?')) return;
-          const slot = document.querySelector('.modules-inner');
-          const wrapper = document.createElement('div'); wrapper.className='module-crystallized';
-          wrapper.innerHTML = sanitized;
-          slot.appendChild(wrapper);
-          speakText('HTML injetado (unsafe).');
-          return;
-        } else {
-          const iframe = document.createElement('iframe');
-          iframe.style.width = '100%';
-          iframe.style.height = '240px';
-          iframe.style.border = 'none';
-          iframe.style.borderRadius = '12px';
-          iframe.setAttribute('sandbox','allow-forms allow-same-origin allow-popups'); // sem scripts
-          iframe.srcdoc = sanitized;
-          document.querySelector('.modules-inner').appendChild(iframe);
-          speakText('HTML injetado em sandbox seguro.');
-          return;
-        }
-      }
-
-      // ---------- CodeMirror init (substitui textarea) ----------
-      const cssTextarea = document.getElementById('cssEditor');
-      let editor = null;
-      try {
-        editor = CodeMirror.fromTextArea(cssTextarea, {
-          mode: 'css',
-          lineNumbers: true,
-          lineWrapping: true,
-          tabSize: 2,
-          theme: 'material',
-          viewportMargin: Infinity
-        });
-        editor.setSize('100%', 160);
-      } catch(e){
-        console.warn('CodeMirror não inicializou. Voltando para textarea nativa.', e);
-        editor = {
-          getValue: () => (document.getElementById('cssEditor') || {value:''}).value,
-          setValue: (v) => { const el = document.getElementById('cssEditor'); if(el) el.value = v; },
-          on: ()=>{},
-          off: ()=>{}
-        };
-      }
-
-      // helper wrapper to safely apply css from editor
-      function editorSafeApplyCss(text, scoped){
-        try { applyCss(text, scoped); }
-        catch(e){ console.warn('Erro ao aplicar CSS:', e); alert('Erro ao aplicar CSS. Veja console.'); }
-      }
-
-      // live update with debounce (editor change)
-      let cssTimer = null;
-      function onEditorChangeHandler(){
-        clearTimeout(cssTimer);
-        cssTimer = setTimeout(()=> {
-          try { editorSafeApplyCss(editor.getValue(), scopeCss.checked); } catch(e){ console.warn(e); }
-        }, 350);
-      }
-      if(editor && typeof editor.on === 'function') editor.on('change', onEditorChangeHandler);
-      else {
-        const ta = document.getElementById('cssEditor');
-        if(ta) ta.addEventListener('input', onEditorChangeHandler);
-      }
-
-      applyCssBtn.addEventListener('click', ()=> editorSafeApplyCss(editor.getValue(), scopeCss.checked));
-      saveCssBtn.addEventListener('click', ()=> { try { localStorage.setItem(CSS_KEY, editor.getValue()); speakText('CSS salvo.'); } catch(e){ console.warn(e); } });
-      resetCssBtn.addEventListener('click', ()=> { editor.setValue(''); applyCss('', scopeCss.checked); try { localStorage.setItem(CSS_KEY, ''); } catch(e){} });
-
-      // save/load css helpers
-      function loadCss(){ try { return localStorage.getItem(CSS_KEY) || ''; } catch(e){ return ''; } }
-
-      // events & bindings
-      chooseBtn.addEventListener('click', ()=> fileInput.click());
-      fileInput.addEventListener('change', async (e)=>{ if(e.target.files && e.target.files[0]) { await handleFile(e.target.files[0]); fileInput.value=''; } });
-
-      ['dragenter','dragover'].forEach(ev=> dropZone.addEventListener(ev,(e)=>{ e.preventDefault(); dropZone.style.borderColor='rgba(255,255,255,0.2)'; }) );
-      ['dragleave','drop'].forEach(ev=> dropZone.addEventListener(ev,(e)=>{ e.preventDefault(); dropZone.style.borderColor='rgba(255,255,255,0.06)'; }) );
-      dropZone.addEventListener('drop', async (e)=>{ const f = e.dataTransfer.files && e.dataTransfer.files[0]; if(f) await handleFile(f); });
-
-      injectBtn.addEventListener('click', injectModule);
-      speakBtn.addEventListener('click', ()=> speakText());
-      removePreviewBtn.addEventListener('click', removePreview);
-      crystallizeBtn.addEventListener('click', crystallizeCurrent);
-      clearModulesBtn.addEventListener('click', clearSaved);
-
-      // load saved modules & css on boot
-      document.addEventListener('DOMContentLoaded', ()=>{
-        renderSavedList();
-        const savedCss = loadCss();
-        if(savedCss){
-          try { editor.setValue(savedCss); } catch(e){ console.warn(e); }
-          applyCss(savedCss, scopeCss.checked);
-        }
-      });
-
-      // ---------- Activation controls ----------
-      function copyToClipboard(text){
-        if(navigator.clipboard && navigator.clipboard.writeText) {
-          return navigator.clipboard.writeText(text);
-        } else {
-          const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
-          ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-          return Promise.resolve();
-        }
-      }
-
-      function openShareLink(kind, text){
-        const encoded = encodeURIComponent(text);
-        if(kind === 'whatsapp'){
-          const url = `https://wa.me/?text=${encoded}`;
-          window.open(url, '_blank');
-        } else if(kind === 'gemini'){
-          // placeholder: Gemini doesn't expose a public share URL — open a search with the activation text
-          const url = `https://www.google.com/search?q=${encoded}`;
-          window.open(url, '_blank');
-        } else if(kind === 'chatgpt'){
-          // placeholder: when tiver sua URL do assistant substitua aqui
-          const url = `https://chat.openai.com/?msg=${encoded}`;
-          window.open(url, '_blank');
-        }
-      }
-
+    if(els.copyActBtn){
       els.copyActBtn.addEventListener('click', ()=>{
-        const txt = els.actPre.innerText;
-        copyToClipboard(txt).then(()=> { alert('Ativação copiada!'); }).catch(()=> alert('Erro ao copiar.'));
+        if(!els.actPre) return;
+        copyToClipboard(els.actPre.innerText).then(()=> showToaster('Ativação copiada'));
       });
-      els.waActBtn.addEventListener('click', ()=> openShareLink('whatsapp', els.actPre.innerText));
-      els.gemActBtn.addEventListener('click', ()=> openShareLink('gemini', els.actPre.innerText));
-      els.chatActBtn.addEventListener('click', ()=> openShareLink('chatgpt', els.actPre.innerText));
+    }
 
+    if(els.downloadActBtn){
       els.downloadActBtn.addEventListener('click', async ()=>{
-        // captura o activationCard visual
-        const el = document.getElementById('activationCard');
-        // Temporariamente remove a classe hidden para garantir render correto
+        if(!els.activationCard) return;
+        const el = els.activationCard;
         const prevHidden = el.classList.contains('activation-hidden');
         if(prevHidden){ el.classList.remove('activation-hidden'); el.classList.add('activation-open'); }
         try {
-          const canvas = await html2canvas(el, {backgroundColor: null, scale: 2});
+          const canvas = await html2canvas(el, {backgroundColor:null, scale:2});
           const a = document.createElement('a');
           a.download = `activation-${(new Date()).toISOString().replace(/[:.]/g,'')}.png`;
           a.href = canvas.toDataURL('image/png');
           a.click();
-        } catch(e){ console.error(e); alert('Erro ao exportar PNG'); }
+        } catch(e){
+          console.error(e);
+          showToaster('Erro exportando PNG');
+        }
         if(prevHidden){ el.classList.add('activation-hidden'); el.classList.remove('activation-open'); }
       });
+    }
 
+    // Toaster (simples placeholder)
+    const toasterWrap = (() => {
+      let w = document.getElementById('toasterWrap');
+      if(!w){
+        w = document.createElement('div');
+        w.id = 'toasterWrap';
+        w.className = 'toaster-wrap';
+        document.body.appendChild(w);
+      }
+      return w;
     })();
+    function showToaster(text, ms = 3000){
+      const node = document.createElement('div'); node.className = 'toaster'; node.innerText = text + ' — (toaster: implementação futura)';
+      toasterWrap.appendChild(node);
+      requestAnimationFrame(()=> node.classList.add('show'));
+      setTimeout(()=>{ node.classList.remove('show'); setTimeout(()=> node.remove(),300); }, ms);
+    }
+
+    // ensure activation updates on startup
+    (function bootstrapActivation(){
+      const initial = localStorage.getItem('fusion_user') || '';
+      updateActivationBlock(initial || 'Convidado');
+    })();
+
   </script>
 </body>
 </html>
