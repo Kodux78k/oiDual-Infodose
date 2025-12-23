@@ -34,6 +34,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
 
+  <!-- html2canvas para export PNG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
   <style>
     :root{
       --bg-deep:#030406; --glass-surface:rgba(18,18,22,0.65); --glass-border:rgba(255,255,255,0.06);
@@ -196,6 +199,21 @@
       100%{ box-shadow: 0 0 0 0 rgba(255,210,80,0.0); transform: translateY(0); }
     }
 
+    /* ASCII activation card */
+    .activation-wrap{display:flex;flex-direction:column;gap:8px}
+    .activation-toggle{display:flex;gap:8px;align-items:center;cursor:pointer}
+    .activation-card{
+      background:rgba(0,0,0,0.25);
+      border:1px solid rgba(255,255,255,0.04);
+      padding:12px;border-radius:10px;overflow:hidden;transition:all 320ms var(--ease-smooth);
+    }
+    .activation-pre{font-family:var(--font-code);white-space:pre-wrap;margin:0;padding:8px;background:rgba(0,0,0,0.12);border-radius:8px;border:1px dashed rgba(255,255,255,0.03);color:#fff}
+    .activation-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .activation-mini{display:flex;align-items:center;gap:8px}
+    .activation-mini .mini-avatar{width:36px;height:36px;border-radius:8px;overflow:hidden;background:#071018;display:inline-flex;align-items:center;justify-content:center}
+    .activation-badge{font-family:var(--font-code);background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.02)}
+    .activation-hidden{max-height:0;opacity:0;padding:0 12px;pointer-events:none}
+    .activation-open{max-height:400px;opacity:1;padding:12px}
     /* CodeMirror tweak: allow vertical resize */
     .CodeMirror { border-radius:8px; background: #071018; }
     .CodeMirror-scroll { max-height: 320px; }
@@ -246,6 +264,49 @@
           <span id="triggerText">ABRIR MÓDULOS</span>
           <i data-lucide="chevron-down" id="triggerIcon"></i>
         </div>
+
+        <!-- ----- ACTIVATION ASCII (BASE) ----- -->
+        <div class="activation-wrap stagger-item">
+          <div class="activation-toggle" id="activationToggle" onclick="toggleActivation()">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:10px;height:10px;border-radius:99px;background:var(--neon-cyan)"></div>
+              <strong style="letter-spacing:1px">Ativação ASCII</strong>
+            </div>
+            <div style="margin-left:auto;font-size:0.82rem;color:rgba(255,255,255,0.6)">BASE v1</div>
+          </div>
+
+          <div id="activationCard" class="activation-card activation-hidden">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <div class="activation-mini">
+                <div class="mini-avatar" id="actMiniAvatar"></div>
+                <div style="display:flex;flex-direction:column;">
+                  <div id="actTitle" style="font-weight:700">CÉREBRO-ORÁCULO — BASE v1</div>
+                  <div style="font-size:0.78rem;color:rgba(255,255,255,0.55)">Ativar: <span id="actName">(Convidado).Dual Infodose</span></div>
+                </div>
+              </div>
+              <div style="margin-left:auto;display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+                <div class="activation-badge" id="actBadge">v:--</div>
+                <div style="font-size:0.72rem;color:rgba(255,255,255,0.45)">Rolling system</div>
+              </div>
+            </div>
+
+            <pre id="actPre" class="activation-pre" aria-live="polite">
++------------------------------+
+| CÉREBRO-ORÁCULO — BASE v1    |
++------------------------------+
+Ativar: (Convidado).Dual Infodose
+            </pre>
+
+            <div class="activation-controls">
+              <button class="trigger-btn" id="copyActBtn" type="button">COPIAR</button>
+              <button class="trigger-btn" id="waActBtn" type="button">WHATSAPP</button>
+              <button class="trigger-btn" id="gemActBtn" type="button">GEMINI</button>
+              <button class="trigger-btn" id="chatActBtn" type="button">ChatGPT</button>
+              <button class="trigger-btn" id="downloadActBtn" type="button">EXPORT PNG</button>
+            </div>
+          </div>
+        </div>
+        <!-- ----- fim ACTIVATION ASCII ----- -->
 
         <div class="hidden-modules stagger-item" id="modulesArea">
           <div class="modules-inner">
@@ -352,7 +413,18 @@
       smallPreview: document.getElementById('smallPreview'),
       smallMiniAvatar: document.getElementById('smallMiniAvatar'),
       smallText: document.getElementById('smallText'),
-      smallIdent: document.getElementById('smallIdent')
+      smallIdent: document.getElementById('smallIdent'),
+      activationToggle: document.getElementById('activationToggle'),
+      activationCard: document.getElementById('activationCard'),
+      actPre: document.getElementById('actPre'),
+      actName: document.getElementById('actName'),
+      actMiniAvatar: document.getElementById('actMiniAvatar'),
+      actBadge: document.getElementById('actBadge'),
+      copyActBtn: document.getElementById('copyActBtn'),
+      waActBtn: document.getElementById('waActBtn'),
+      gemActBtn: document.getElementById('gemActBtn'),
+      chatActBtn: document.getElementById('chatActBtn'),
+      downloadActBtn: document.getElementById('downloadActBtn')
     };
 
     // Avatar SVG (full)
@@ -431,6 +503,36 @@
         els.smallPreview.classList.add('vibe-gold');
       }
       els.smallMiniAvatar.innerHTML = makeMiniAvatarHTML(name || 'DUAL', 30);
+
+      // também atualiza a ativação
+      updateActivationBlock(name || 'Convidado');
+    }
+
+    // ASCII Activation generator
+    function createAsciiActivation(name){
+      const displayName = name && name.trim() ? `${name.trim()}.Dual Infodose` : '(Convidado).Dual Infodose';
+      const root = reduce369Short(name);
+      // lines (adjust width dynamically)
+      const title = 'CÉREBRO-ORÁCULO — BASE v1';
+      const content = `Ativar: ${displayName}`;
+      const width = Math.max(title.length, content.length) + 4;
+      const top = '+' + '-'.repeat(width) + '+';
+      const midTitle = `| ${title.padEnd(width - 1)}|`;
+      const top2 = '+' + '-'.repeat(width) + '+';
+      const body = `${content}`;
+      const ascii = `${top}\n${midTitle}\n${top2}\n${body}\n`;
+      return { ascii, displayName, root, title, content };
+    }
+
+    function updateActivationBlock(name){
+      const r = createAsciiActivation(name);
+      els.actPre.innerText = r.ascii;
+      els.actName.innerText = r.displayName;
+      els.actMiniAvatar.innerHTML = makeMiniAvatarHTML(name || 'DUAL', 36);
+      els.actBadge.innerText = `v:${r.root}`;
+      // vibe gold on 3/6/9
+      els.actBadge.classList.remove('vibe-gold');
+      if(r.root === 3 || r.root === 6 || r.root === 9) { els.actBadge.classList.add('vibe-gold'); }
     }
 
     // Inicialização
@@ -551,6 +653,12 @@
       els.triggerIcon.setAttribute('data-lucide', isOpen ? 'chevron-up' : 'chevron-down');
       if(isOpen) speak('Carregando módulos.');
       lucide.createIcons();
+    }
+
+    // Activation toggle (sanfonado)
+    function toggleActivation(){
+      els.activationCard.classList.toggle('activation-hidden');
+      els.activationCard.classList.toggle('activation-open');
     }
 
     // Clock
@@ -901,6 +1009,57 @@
           try { editor.setValue(savedCss); } catch(e){ console.warn(e); }
           applyCss(savedCss, scopeCss.checked);
         }
+      });
+
+      // ---------- Activation controls ----------
+      function copyToClipboard(text){
+        if(navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+          ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+          return Promise.resolve();
+        }
+      }
+
+      function openShareLink(kind, text){
+        const encoded = encodeURIComponent(text);
+        if(kind === 'whatsapp'){
+          const url = `https://wa.me/?text=${encoded}`;
+          window.open(url, '_blank');
+        } else if(kind === 'gemini'){
+          // placeholder: Gemini doesn't expose a public share URL — open a search with the activation text
+          const url = `https://www.google.com/search?q=${encoded}`;
+          window.open(url, '_blank');
+        } else if(kind === 'chatgpt'){
+          // placeholder: when tiver sua URL do assistant substitua aqui
+          const url = `https://chat.openai.com/?msg=${encoded}`;
+          window.open(url, '_blank');
+        }
+      }
+
+      els.copyActBtn.addEventListener('click', ()=>{
+        const txt = els.actPre.innerText;
+        copyToClipboard(txt).then(()=> { alert('Ativação copiada!'); }).catch(()=> alert('Erro ao copiar.'));
+      });
+      els.waActBtn.addEventListener('click', ()=> openShareLink('whatsapp', els.actPre.innerText));
+      els.gemActBtn.addEventListener('click', ()=> openShareLink('gemini', els.actPre.innerText));
+      els.chatActBtn.addEventListener('click', ()=> openShareLink('chatgpt', els.actPre.innerText));
+
+      els.downloadActBtn.addEventListener('click', async ()=>{
+        // captura o activationCard visual
+        const el = document.getElementById('activationCard');
+        // Temporariamente remove a classe hidden para garantir render correto
+        const prevHidden = el.classList.contains('activation-hidden');
+        if(prevHidden){ el.classList.remove('activation-hidden'); el.classList.add('activation-open'); }
+        try {
+          const canvas = await html2canvas(el, {backgroundColor: null, scale: 2});
+          const a = document.createElement('a');
+          a.download = `activation-${(new Date()).toISOString().replace(/[:.]/g,'')}.png`;
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+        } catch(e){ console.error(e); alert('Erro ao exportar PNG'); }
+        if(prevHidden){ el.classList.add('activation-hidden'); el.classList.remove('activation-open'); }
       });
 
     })();
